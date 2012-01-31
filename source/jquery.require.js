@@ -2,6 +2,7 @@
  * jquery.require.
  * A dependency loader built on top of $.Deferred() backbone.
  * An alternative take on RequireJS.
+ * https://github.com/jstonne/jquery.require
  *
  * Copyright (c) 2012 Jensen Tonne
  * www.jstonne.com
@@ -27,7 +28,7 @@ var self = $.require = function(options) {
 
 	self.batches.push(batch);
 
-	return task;
+	return batch;
 
 };
 
@@ -70,48 +71,50 @@ $.extend($.require, {
 
 		batch.tasks = [];
 
-		// Create proxy functions to require loaders,
-		// assigning "this" as current batch.
-
-		$.each(self.loaders, function(name, factory) {
-
-			batch[name] = function() {
-
-				factory.apply(this, arguments);
-
-				// Ensure require calls are chainable
-				return batch;
-			}
-
-		});
-
-		// Masquerade batch as a pseudo-promise object
-		// until one of its method is actually called.
-
-		$.each(['then','done','fail','always','pipe','progress'], function(i, func) {
-
-			batch[func] = function() {
-
-				// Create a master deferred object using $.when
-				// and extend it onto our batch object.
-
-				$.extend(batch, $.when.apply(null, batch.tasks));
-
-				return batch[func].apply(arguments);
-			}
-		});
-
 		return batch;
 	},
 
-	loaders: {},
+	addLoader: function(name, factory) {
 
-	loader: function(name, factory) {
+		// Static call, e.g.
+		// $.require.script.setup({});
+		self[name] = factory;
+
+		// Create proxy functions to require loaders,
+		// assigning current batch to factory's "this".
+		self.batch.prototype[name] = function() {
+
+			factory.apply(this, arguments);
+
+			// Ensure require calls are chainable
+			return this;
+		}
 
 		self.loaders[name] = self[name] = factory;
+	},
+
+	removeLoader: function(name) {
+		delete self.batch.prototype[name];
+		delete self[name];
 	}
 
 });
 
+// Masquerade newly created batch instances as a pseudo-promise object
+// until one of those promise's method is called. This is to ensure that
+// no callbacks are fired too early until all loading tasks are set.
+
+$.each(['then','done','fail','always','pipe','progress'], function(i, func) {
+
+	self.batch.prototype[func] = function() {
+
+		// Create a master deferred object using $.when
+		// and extend it onto our batch object.
+
+		$.extend(this, $.when.apply(null, this.tasks));
+
+		return this[func].apply(arguments);
+	}
+});
 
 })(jQuery);
