@@ -111,7 +111,7 @@ $.extend($.require, {
 
 $.extend(self.batch.prototype, {
 
-	tasks: [],
+	taskList: [],
 
 	tasksFinalized: false,
 
@@ -138,7 +138,7 @@ $.extend(self.batch.prototype, {
 			batch.taskProgress
 		);
 
-		batch.tasks.push(task);
+		batch.taskList.push(task);
 	},
 
 	taskDone: function() {
