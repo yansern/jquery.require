@@ -86,6 +86,8 @@ $.require = (function() {
 
 		addLoader: function(name, factory) {
 
+			var batch = this;
+
 			// Static call, e.g.
 			// $.require.script.setup({});
 			self[name] = factory;
@@ -94,10 +96,10 @@ $.require = (function() {
 			// assigning current batch to factory's "this".
 			self.batch.prototype[name] = function() {
 
-				factory.apply(this, arguments);
+				factory.apply(batch, arguments);
 
 				// Ensure require calls are chainable
-				return this;
+				return batch;
 			};
 
 			self.loaders[name] = self[name] = factory;
