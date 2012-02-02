@@ -26,7 +26,11 @@ var self = $.require = function(options) {
 
 	var batch = new self.batch(options);
 
-	self.batches.push(batch);
+	self.batches[batch.id] = batch;
+
+	if (batch.options.verbose) {
+		console.info('$.require: Batch ' + batch.id + ' created.', batch);
+	}
 
 	return batch;
 
@@ -53,7 +57,9 @@ $.extend($.require, {
 
 		timeout: 10000,
 
-		retry: 3
+		retry: 3,
+
+		verbose: true
 	},
 
 	setup: function(options) {
@@ -61,15 +67,18 @@ $.extend($.require, {
 		$.extend(self.defaultOptions, options);
 	},
 
-	batches: [],
+	batches: {},
 
 	batch: function(options) {
 
 		var batch = this;
 
-		batch.options = $.extend({}, self.defaultOptions, options);
+		batch.id = $.uid();
 
-		batch.tasks = [];
+		// Batch manager tracks the state of tasks in batch.taskList and batch.tasks.
+		batch.manager = $.Deferred();
+
+		batch.options = $.extend({}, self.defaultOptions, options);
 
 		return batch;
 	},
@@ -88,7 +97,7 @@ $.extend($.require, {
 
 			// Ensure require calls are chainable
 			return this;
-		}
+		};
 
 		self.loaders[name] = self[name] = factory;
 	},
@@ -100,20 +109,115 @@ $.extend($.require, {
 
 });
 
+$.extend(self.batch.prototype, {
+
+	tasks: [],
+
+	tasksFinalized: false,
+
+	addTask: function(task) {
+
+		var batch = this;
+
+		if (!$.isDeferred(task)) {
+			return;
+		};
+
+		if (taskFinalized) {
+
+			if (batch.options.verbose) {
+				console.warn('$.require: ' + task.name + ' ignored because tasks of this batch are finalized.', task);
+			};
+
+			return;
+		};
+
+		task.then(
+			batch.taskDone,
+			batch.taskFail,
+			batch.taskProgress
+		);
+
+		batch.tasks.push(task);
+	},
+
+	taskDone: function() {
+
+		var batch = this;
+
+		if (batch.options.verbose) {
+			console.info('$.require: ' + task.name + ' loaded successfully.', task);
+		};
+
+		batch.manager.notifyWith(batch, [task]);
+	},
+
+	taskFail: function() {
+
+		var batch = this;
+
+		if (batch.options.verbose) {
+			console.error('$.require: ' + task.name + ' failed to load.', task);
+		};
+
+		batch.manager.notifyWith(batch, [task]);
+	},
+
+	taskProgress: function() {
+
+		var batch = this;
+
+		batch.manager.notifyWith(batch, [task]);
+	},
+
+	// TODO: Statistics
+	stat: function(){
+	}
+});
+
 // Masquerade newly created batch instances as a pseudo-promise object
 // until one of those promise's method is called. This is to ensure that
-// no callbacks are fired too early until all loading tasks are set.
+// no callbacks are fired too early until all loading tasks are finalized.
 
 $.each(['then','done','fail','always','pipe','progress'], function(i, func) {
 
 	self.batch.prototype[func] = function() {
 
-		// Create a master deferred object using $.when
-		// and extend it onto our batch object.
+		var batch = this;
 
-		$.extend(this, $.when.apply(null, this.tasks));
+		// Finalize all tasks so no further tasks
+		// can be added to the batch job.
+		batch.taskFinalized = true;
 
-		return this[func].apply(arguments);
+		// Extend batch with batch manager's promise methods,
+		// overriding original pseudo-promise methods.
+		$.extend(batch, batch.manager.promise());
+
+		// Create a master deferred object for all tasks
+		batch.tasks = $.when.apply(null, batch.taskList);
+
+		batch.tasks
+			// Resolve batch if all tasks are done
+			.done(function(){
+
+				if (batch.options.verbose) {
+					console.info('$.require: Batch ' + batch.id + ' completed.', batch);
+				};
+
+				batch.manager.resolve();
+			})
+
+			// Reject batch if one of the task failed
+			.fail(function(){
+
+				if (batch.options.verbose) {
+					console.info('$.require: Batch ' + batch.id + ' completed.', batch);
+				};
+
+				batch.manager.reject();
+			});
+
+		return batch;
 	}
 });
 
