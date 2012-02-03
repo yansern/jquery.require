@@ -14,8 +14,8 @@
  *
  */
 
-$.require.addLoader('script', (function()
-{
+$.require.addLoader('script', (function() {
+
 	var canAsync = document.createElement("script").async === true || "MozAppearance" in document.documentElement.style || window.opera;
 
 	var self = function() {
@@ -26,7 +26,7 @@ $.require.addLoader('script', (function()
 			names;
 
 		// Expand arguments into its actual definition
-		if ($.isPlainObject(args[0]) {
+		if ($.isPlainObject(args[0])) {
 			options = args[0];
 			names = args.slice(1);
 		} else {
@@ -85,7 +85,9 @@ $.require.addLoader('script', (function()
 			$.extend(self.defaultOptions, options);
 		},
 
-		task: function(name, options, taskBefore)
+		scripts: {},
+
+		task: function(name, options, taskBefore) {
 
 			var task = $.extend(this, $.Deferred());
 
@@ -146,7 +148,7 @@ $.require.addLoader('script', (function()
 
 	});
 
-	$.extend(self.task, {
+	$.extend(self.task.prototype, {
 
 		start: function() {
 
@@ -247,6 +249,12 @@ $.require.addLoader('script', (function()
 
 						async: task.options.async,
 
+						timeout: task.batch.options.timeout,
+
+						retry: task.batch.options.retry,
+
+						verbose: task.batch.options.verbose
+
 					});
 
 				return self.scripts[task.url] = script;
@@ -268,7 +276,7 @@ $.require.addLoader('script', (function()
 						if (task.module) {
 
 							task.module
-								.done(task.resolve);
+								.done(task.resolve)
 								.fail(task.reject);
 
 						} else {
@@ -322,4 +330,5 @@ $.require.addLoader('script', (function()
 
 	return self;
 
-});
+})()
+);

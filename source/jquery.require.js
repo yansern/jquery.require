@@ -60,7 +60,7 @@ $.require = (function() {
 
 			retry: 3,
 
-			verbose: true
+			verbose: false
 		},
 
 		setup: function(options) {
@@ -84,9 +84,9 @@ $.require = (function() {
 			return batch;
 		},
 
-		addLoader: function(name, factory) {
+		loaders: {},
 
-			var batch = this;
+		addLoader: function(name, factory) {
 
 			// Static call, e.g.
 			// $.require.script.setup({});
@@ -95,6 +95,8 @@ $.require = (function() {
 			// Create proxy functions to require loaders,
 			// assigning current batch to factory's "this".
 			self.batch.prototype[name] = function() {
+
+				var batch = this;
 
 				factory.apply(batch, arguments);
 
@@ -128,7 +130,7 @@ $.require = (function() {
 				return;
 			};
 
-			if (taskFinalized) {
+			if (batch.taskFinalized) {
 
 				if (batch.options.verbose) {
 					console.warn('$.require: ' + task.name + ' ignored because tasks of this batch are finalized.', task);
@@ -137,10 +139,12 @@ $.require = (function() {
 				return;
 			};
 
+			task.batch = batch;
+
 			task.then(
-				batch.taskDone,
-				batch.taskFail,
-				batch.taskProgress
+				$.proxy(batch.taskDone, task),
+				$.proxy(batch.taskFail, task),
+				$.proxy(batch.taskProgress, task)
 			);
 
 			batch.taskList.push(task);
@@ -148,7 +152,8 @@ $.require = (function() {
 
 		taskDone: function() {
 
-			var batch = this;
+			var task = this,
+				batch = task.batch;
 
 			if (batch.options.verbose) {
 				console.info('$.require: ' + task.name + ' loaded successfully.', task);
@@ -159,7 +164,8 @@ $.require = (function() {
 
 		taskFail: function() {
 
-			var batch = this;
+			var task = this,
+				batch = task.batch;
 
 			if (batch.options.verbose) {
 				console.error('$.require: ' + task.name + ' failed to load.', task);
@@ -170,7 +176,8 @@ $.require = (function() {
 
 		taskProgress: function() {
 
-			var batch = this;
+			var task = this,
+				batch = task.batch;
 
 			batch.manager.notifyWith(batch, [task]);
 		},
