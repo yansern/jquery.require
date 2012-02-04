@@ -79,9 +79,11 @@ $.require = (function() {
 			// Batch manager tracks the state of tasks in batch.taskList and batch.tasks.
 			batch.manager = $.Deferred();
 
-			batch.options = $.extend({}, self.defaultOptions, options);
+			batch.taskList = [];
 
-			return batch;
+			batch.tasksFinalized = false;
+
+			batch.options = $.extend({}, self.defaultOptions, options);
 		},
 
 		loaders: {},
@@ -117,10 +119,6 @@ $.require = (function() {
 	// Batch class
 
 	$.extend(self.batch.prototype, {
-
-		taskList: [],
-
-		tasksFinalized: false,
 
 		addTask: function(task) {
 
@@ -228,6 +226,9 @@ $.require = (function() {
 
 					batch.manager.reject();
 				});
+
+			// Execute method that was originally called
+			batch[func].apply(batch, arguments);
 
 			return batch;
 		}
