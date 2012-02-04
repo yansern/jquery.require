@@ -26,3 +26,17 @@ var testFailedLoadOrder = function() {
 	 );
 
 }
+
+
+var testLoadModuleOrder = function() {
+
+	$.require({
+		timeout: 1000,
+		verbose: true
+	})
+	 .script(
+	 	'module.one',
+	 	'module.two'
+	 );
+
+}

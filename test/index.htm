@@ -4,11 +4,13 @@
 <head>
     <title>jquery.require</title>
     <script type="text/javascript" src="../../jquery/jquery.js"></script>
+
     <script type="text/javascript" src="../../jquery.isDeferred/source/jquery.isdeferred.js"></script>
     <script type="text/javascript" src="../../jquery.uid/source/jquery.uid.js"></script>
     <script type="text/javascript" src="../../jquery.uri/dist/jquery.uri.js"></script>
     <script type="text/javascript" src="../../jquery.script/source/jquery.script.js"></script>
 
+    <script type="text/javascript" src="../source/jquery.module.js"></script>
     <script type="text/javascript" src="../source/jquery.require.js"></script>
     <script type="text/javascript" src="../source/jquery.require.script.js"></script>
     <script type="text/javascript" src="test.js"></script>
@@ -17,5 +19,7 @@
     <h1>jquery.require - test</h1>
     <button type="button" onclick="testLoadOrder();">Test load order</button>
     <button type="button" onclick="testFailedLoadOrder();">Test failed load order</button>
+
+    <button type="button" onclick="testLoadModuleOrder();">Test module loading order</button>
 </body>
 </html>
