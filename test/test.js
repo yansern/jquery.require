@@ -49,7 +49,6 @@ var testLoadModuleOrder = function() {
 	 })
 }
 
-
 var testLoadNestedModuleOrder = function() {
 
 	$.require({
@@ -66,3 +65,28 @@ var testLoadNestedModuleOrder = function() {
 	 });
 
 }
+
+
+var testMixedLoadOrder = function() {
+
+	$.require({
+		timeout: 1000,
+		verbose: true
+	})
+	 .script(
+	 	'module.nested.one',
+	 	'./files/1.js',
+	 	'module.nested.two',
+	 	'./files/2.js',
+	 	'module.four'
+	 )
+	 .done(function(){
+	 	console.log('Test mixed load order ended.');
+	 });
+
+}
+
+
+
+
+
