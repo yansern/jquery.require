@@ -139,7 +139,7 @@ $.require.addLoader('script', (function() {
 			} else {
 
 				task.url = $.uri(task.options.path)
-							.toPath('./' + name + task.options.extension)
+							.toPath('./' + name + '.' + task.options.extension)
 							.toString();
 
 				task.module = $.module(name);
