@@ -46,12 +46,17 @@ $.module = (function() {
 		     *  });
              *
 		     */
+
 			if ($.isFunction(factory)) {
 
 				module.factory = factory;
 
+				module.status = "loading";
+
 				// Execute factory
 				factory.call(module);
+
+				return module;
 			}
 		}
 
@@ -144,6 +149,7 @@ $.module = (function() {
 
 			module.done(function() {
 				module.exports = this;
+				module.status = "ready";
 			});
 
 			return self.registry[name] = module;
@@ -155,4 +161,5 @@ $.module = (function() {
 	});
 
 	return self;
-});
+
+})();
