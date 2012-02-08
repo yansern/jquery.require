@@ -17,8 +17,6 @@ $.require = (function() {
 
 	// internal function
 	var getFolderPath = function(path) {
-
-		// TODO: Convert relative path into absolute path, those from <script> src attribute.
 		return $.uri(path).setAnchor('').setQuery('').toPath('../').toString();
 	};
 
@@ -43,15 +41,20 @@ $.require = (function() {
 
 			// Path selection order:
 			path: (function() {
+
 				var path =
 					// By "require_path" attribute
-					$('script:has([require_path])').attr('require_path') ||
+					$('[require-path]').attr('require-path') ||
 
 					// By last script tag's "src" attribute
 					getFolderPath($('script:last').attr('src')) ||
 
 					// By window location
 					getFolderPath(window.location.href);
+
+				if (/^(\/|\.)/.test(path)) {
+					path = $.uri(window.location.href).toPath(path).toString();
+				}
 
 				return path;
 			})(),
