@@ -9,19 +9,40 @@
     <script type="text/javascript" src="../../jquery.uid/source/jquery.uid.js"></script>
     <script type="text/javascript" src="../../jquery.uri/dist/jquery.uri.js"></script>
     <script type="text/javascript" src="../../jquery.script/source/jquery.script.js"></script>
+    <script type="text/javascript" src="../../jquery.stylesheet/source/jquery.stylesheet.js"></script>
+    <script type="text/javascript" src="../../jquery.template/source/jquery.template.js"></script>
 
     <script type="text/javascript" src="../source/jquery.module.js"></script>
-    <script type="text/javascript" src="../source/jquery.require.js"></script>
+    <script type="text/javascript" require-path="../" src="../source/jquery.require.js"></script>
     <script type="text/javascript" src="../source/jquery.require.script.js"></script>
+    <script type="text/javascript" src="../source/jquery.require.stylesheet.js"></script>
+    <script type="text/javascript" src="../source/jquery.require.template.js"></script>
     <script type="text/javascript" src="test.js"></script>
     </head>
 <body>
-    <h1>jquery.require - test</h1>
+    <h3>jquery.require.script - test</h3>
     <button type="button" onclick="testLoadOrder();">Test load order</button>
     <button type="button" onclick="testFailedLoadOrder();">Test failed load order</button>
 
     <button type="button" onclick="testLoadModuleOrder();">Test module loading order</button>
     <button type="button" onclick="testLoadNestedModuleOrder();">Test nested module loading order</button>
     <button type="button" onclick="testMixedLoadOrder();">Test mixed file &amp; module loading order</button>
+
+    <hr />
+
+    <h3>jquery.require.stylesheet - test</h3>
+    <button type="button" onclick="testStylesheetLoading();">Test stylesheet loading</button>
+    <div class="style1">Red</div>
+    <div class="style2">Green</div>
+    <div class="style3">Blue</div>
+
+    <hr />
+
+    <h3>jquery.require.template - test</h3>
+    <button type="button" onclick="testTemplateLoading();">Test template loading</button>
+    <div class="templateContent1"></div>
+    <div class="templateContent2"></div>
+    <div class="templateContent3"></div>
+
 </body>
 </html>

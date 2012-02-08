@@ -86,7 +86,38 @@ var testMixedLoadOrder = function() {
 
 }
 
+var testStylesheetLoading = function() {
 
+	$.require({
+		timeout: 1000,
+		verbose: true
+	})
+	.stylesheet(
+		'style.one',
+		'./style.two.css',
+		'./files/style.three.css'
+	)
+	.done(function(){
+		console.log('Test stylesheet loading ended.');
+	});
+}
 
+var testTemplateLoading = function() {
+
+	$.require({
+		timeout: 1000,
+		verbose: true
+	})
+	.template(
+		'template.one',
+		['template.two', './template.two.ejs'],
+		['template.three', './files/template.three.ejs']
+	)
+	.done(function(){
+		$('.templateContent1').html( $.template('template.one') );
+		$('.templateContent2').html( $.template('template.two') );
+		$('.templateContent3').html( $.template('template.three') );
+	});
+}
 
 
