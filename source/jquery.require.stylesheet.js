@@ -35,11 +35,17 @@ $.require.addLoader('stylesheet', (function() {
 
 		$.each(names, function(i, name) {
 
-			var task = new self.task(name, options, taskBefore);
+			var task = new self.task(name, options),
+				existingTask = self.stylesheets[task.url];
+
+			task = existingTask || task;
 
 			batch.addTask(task);
 
-			task.start();
+			if (!existingTask) {
+				self.stylesheets[task.url] = task;
+				task.start();
+			}
 		});
 	};
 
@@ -61,6 +67,8 @@ $.require.addLoader('stylesheet', (function() {
 			$.extend(self.defaultOptions, options);
 		},
 
+		stylesheets: {},
+
 		task: function(name, options) {
 
 			var task = $.extend(this, $.Deferred());
@@ -68,8 +76,6 @@ $.require.addLoader('stylesheet', (function() {
 			task.name = name;
 
 			task.options = options;
-
-			// Resolve name to paths
 
 			// Absolute path
 			if ($.isUrl(name)) {
