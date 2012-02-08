@@ -33,7 +33,13 @@ $.require.addLoader('script', (function() {
 			names = args;
 		}
 
-		options = $.extend(self.defaultOptions, options, {batch: batch});
+		options = $.extend(
+			{},
+			self.defaultOptions,
+			batch.options,
+			options,
+			{batch: batch}
+		);
 
 		// Create tasks and add it to the batch.
 		var taskBefore;
@@ -129,7 +135,7 @@ $.require.addLoader('script', (function() {
 				task.url = name;
 
 			// Relative path
-			} else if (/^(\/|\.)/.test(task.name)) {
+			} else if (/^(\/|\.)/.test(name)) {
 
 				task.url = $.uri(task.options.path)
 							.toPath(name)
