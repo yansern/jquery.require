@@ -102,6 +102,24 @@ var testStylesheetLoading = function() {
 	});
 }
 
+var testRepeatedStylesheetLoading = function() {
+
+	$.require({
+		timeout: 1000,
+		verbose: true
+	})
+	.stylesheet(
+		'style.one',
+		'./style.two.css',
+		'./files/style.three.css',
+		'style.two',
+		'./style.one.css'
+	)
+	.done(function(){
+		console.log('Test repeated stylesheet loading ended.');
+	});
+}
+
 var testTemplateLoading = function() {
 
 	$.require({
@@ -117,7 +135,30 @@ var testTemplateLoading = function() {
 		$('.templateContent1').html( $.template('template.one') );
 		$('.templateContent2').html( $.template('template.two') );
 		$('.templateContent3').html( $.template('template.three') );
+		console.log('Test template loading ended.');
 	});
 }
+
+var testRepeatedTemplateLoading = function() {
+
+	$.require({
+		timeout: 1000,
+		verbose: true
+	})
+	.template(
+		'template.one',
+		['template.two', './template.two.ejs'],
+		['template.three', './files/template.three.ejs'],
+		['template.one', './template.one.ejs'],
+		'template.two'
+	)
+	.done(function(){
+		$('.templateContent1').html( $.template('template.one') );
+		$('.templateContent2').html( $.template('template.two') );
+		$('.templateContent3').html( $.template('template.three') );
+		console.log('Test repeated template loading ended.');
+	});
+}
+
 
 
