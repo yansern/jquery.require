@@ -31,7 +31,13 @@ $.require.addLoader('stylesheet', (function() {
 			names = args;
 		}
 
-		options = $.extend(self.defaultOptions, options, {batch: batch});
+		options = $.extend(
+			{},
+			self.defaultOptions,
+			batch.options,
+			options,
+			{batch: batch}
+		);
 
 		$.each(names, function(i, name) {
 
@@ -83,7 +89,7 @@ $.require.addLoader('stylesheet', (function() {
 				task.url = name;
 
 			// Relative path
-			} else if (/^(\/|\.)/.test(task.name)) {
+			} else if (/^(\/|\.)/.test(name)) {
 
 				task.url = $.uri(task.options.path)
 							.toPath(name)
@@ -96,6 +102,9 @@ $.require.addLoader('stylesheet', (function() {
 							.toPath('./' + name + '.' + task.options.extension)
 							.toString();
 			}
+
+			// Remap task.url to task.options.url
+			task.options.url = task.url;
 		}
 
 	});
@@ -120,4 +129,5 @@ $.require.addLoader('stylesheet', (function() {
 
 	return self;
 
-});
+})()
+);
