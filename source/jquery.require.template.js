@@ -31,7 +31,13 @@ $.require.addLoader('template', (function() {
 			names = args;
 		}
 
-		options = $.extend(self.defaultOptions, options, {batch: batch});
+		options = $.extend(
+			{},
+			self.defaultOptions,
+			batch.options,
+			options,
+			{batch: batch}
+		);
 
 		$.each(names, function(i, name) {
 
@@ -58,7 +64,7 @@ $.require.addLoader('template', (function() {
 			$.extend(self.defaultOptions, options);
 		},
 
-		templates: {},
+		loaders: {},
 
 		task: function(name, options, taskBefore) {
 
@@ -83,7 +89,7 @@ $.require.addLoader('template', (function() {
 				task.url = name;
 
 			// Relative path
-			} else if (/^(\/|\.)/.test(task.name)) {
+			} else if (/^(\/|\.)/.test(name)) {
 
 				task.url = $.uri(task.options.path)
 							.toPath(name)
